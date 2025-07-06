@@ -41,10 +41,20 @@ check_git_repo() {
 
 # Check if the tool is initialized in this repository
 check_initialized() {
-    if [[ ! -f "$CONFIG_FILE" ]]; then
+    # Check if we have the no-comments branch as a sign of initialization
+    if ! git show-ref --verify --quiet "refs/heads/$NO_COMMENTS_BRANCH"; then
         log_error "bye-bye-comments is not initialized in this repository."
         log_info "Run 'bye-bye-comments init' to set up."
         exit 1
+    fi
+    
+    # Recreate config file if missing (can happen after branch switches)
+    if [[ ! -f "$CONFIG_FILE" ]]; then
+        cat > "$CONFIG_FILE" << EOF
+# bye-bye-comments configuration
+MAIN_BRANCH=$MAIN_BRANCH
+NO_COMMENTS_BRANCH=$NO_COMMENTS_BRANCH
+EOF
     fi
 }
 
@@ -94,6 +104,14 @@ EOF
     # Create no-comments branch if it doesn't exist
     if ! git show-ref --verify --quiet "refs/heads/$NO_COMMENTS_BRANCH"; then
         log_info "Creating $NO_COMMENTS_BRANCH branch..."
+        
+        # Save current work
+        local stash_created=false
+        if ! git diff-index --quiet HEAD -- || [[ -n $(git ls-files --others --exclude-standard) ]]; then
+            git stash push -u -m "bye-bye-comments: init stash" > /dev/null 2>&1
+            stash_created=true
+        fi
+        
         git checkout -b "$NO_COMMENTS_BRANCH"
         
         # Strip comments from all Rust files
@@ -108,6 +126,13 @@ EOF
         
         # Switch back to original branch
         git checkout "$current_branch"
+        
+        # Restore stashed changes if any
+        if [[ "$stash_created" == true ]]; then
+            git stash pop > /dev/null 2>&1 || true
+        fi
+    else
+        log_info "bye-bye-comments already initialized (no-comments branch exists)"
     fi
     
     # Add bye-bye-comments files to gitignore

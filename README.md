@@ -131,6 +131,24 @@ This tool is designed to be integrated into a VS Code extension, allowing seamle
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+## Troubleshooting
+
+### "not initialized" error after switching branches
+
+If you get an "not initialized" error after using the tool, it's likely because the config file was lost during branch switching. The tool now automatically recreates the config file when needed. Simply run your command again and it should work.
+
+### Config file conflicts during init
+
+If you see errors about `.bye-bye-comments` file conflicts during initialization, the latest version handles this automatically by stashing uncommitted files before creating branches.
+
+### Daemon not stopping
+
+If the daemon doesn't stop properly, you can manually kill it:
+```bash
+kill $(cat .bye-bye-comments-daemon.pid)
+rm .bye-bye-comments-daemon.pid
+```
+
 ## License
 
 MIT License - see LICENSE file for details 
