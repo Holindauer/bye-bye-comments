@@ -110,19 +110,28 @@ EOF
         git checkout "$current_branch"
     fi
     
-    # Add config file to gitignore
+    # Add bye-bye-comments files to gitignore
+    local gitignore_updated=false
+    
     if ! grep -q "^$CONFIG_FILE$" .gitignore 2>/dev/null; then
         echo "$CONFIG_FILE" >> .gitignore
+        gitignore_updated=true
     fi
     
-    # Add daemon PID file to gitignore
     if ! grep -q "^$DAEMON_PID_FILE$" .gitignore 2>/dev/null; then
         echo "$DAEMON_PID_FILE" >> .gitignore
+        gitignore_updated=true
     fi
     
-    # Add daemon log file to gitignore
     if ! grep -q "^.bye-bye-comments-daemon.log$" .gitignore 2>/dev/null; then
         echo ".bye-bye-comments-daemon.log" >> .gitignore
+        gitignore_updated=true
+    fi
+    
+    # Commit gitignore changes if any were made
+    if [[ "$gitignore_updated" == true ]]; then
+        git add .gitignore
+        git commit -m "Add bye-bye-comments files to gitignore" || true
     fi
     
     log_info "Initialization complete!"

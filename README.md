@@ -12,26 +12,47 @@ A CLI tool for Rust projects that maintains two synchronized versions of your co
 
 ## Installation
 
+### Quick Setup (Recommended)
+
 1. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/bye-bye-comments.git
 cd bye-bye-comments
 ```
 
-2. Make the scripts executable:
+2. Run the setup script:
 ```bash
+./setup.sh
+```
+
+The setup script will:
+- Check for required dependencies (git, cargo)
+- Make all scripts executable
+- Create a symlink in `~/.local/bin`
+- Add `~/.local/bin` to your PATH if needed
+- Test the installation
+
+### Manual Installation
+
+If you prefer to install manually:
+
+1. Clone the repository and make scripts executable:
+```bash
+git clone https://github.com/yourusername/bye-bye-comments.git
+cd bye-bye-comments
 chmod +x bye-bye-comments.sh bye-bye-comments-daemon.sh
 ```
 
-3. Add to your PATH (optional):
+2. Create a symlink in your local bin directory:
 ```bash
-# Add to ~/.bashrc or ~/.zshrc
-export PATH="$PATH:/path/to/bye-bye-comments"
+mkdir -p ~/.local/bin
+ln -s $(pwd)/bye-bye-comments.sh ~/.local/bin/bye-bye-comments
 ```
 
-Or create a symlink:
+3. Add `~/.local/bin` to your PATH if not already there:
 ```bash
-sudo ln -s /path/to/bye-bye-comments/bye-bye-comments.sh /usr/local/bin/bye-bye-comments
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ## Usage
