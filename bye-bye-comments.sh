@@ -153,6 +153,11 @@ EOF
         gitignore_updated=true
     fi
     
+    if ! grep -q "^.bye-bye-comments-sync-state$" .gitignore 2>/dev/null; then
+        echo ".bye-bye-comments-sync-state" >> .gitignore
+        gitignore_updated=true
+    fi
+    
     # Commit gitignore changes if any were made
     if [[ "$gitignore_updated" == true ]]; then
         git add .gitignore
@@ -303,9 +308,14 @@ case "${1:-help}" in
             fi
         fi
         
-        # Start the daemon
+        # Start the daemon (use v2 if available, fallback to v1)
+        local daemon_script="$(dirname "$0")/bye-bye-comments-daemon-v2.sh"
+        if [[ ! -f "$daemon_script" ]]; then
+            daemon_script="$(dirname "$0")/bye-bye-comments-daemon.sh"
+        fi
+        
         log_info "Starting bye-bye-comments daemon..."
-        nohup "$(dirname "$0")/bye-bye-comments-daemon.sh" > /dev/null 2>&1 &
+        nohup "$daemon_script" > /dev/null 2>&1 &
         sleep 1  # Give daemon time to start
         
         if [[ -f "$DAEMON_PID_FILE" ]]; then

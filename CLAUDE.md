@@ -16,11 +16,19 @@ This allows developers to switch between viewing code with full documentation an
    - Manages git branch switching with stash preservation
    - Creates and maintains configuration files
 
-2. **bye-bye-comments-daemon.sh** - Background sync daemon
+2. **bye-bye-comments-daemon.sh** - Background sync daemon (v1)
    - Monitors file changes in real-time
    - Detects comment-only vs code changes
    - Automatically syncs comment-only changes between branches
    - Preserves compilation state for comment-only changes
+
+3. **bye-bye-comments-daemon-v2.sh** - Enhanced daemon with bidirectional sync
+   - Monitors all file changes in real-time
+   - Syncs ALL changes between branches automatically
+   - When syncing from `no-comments` to `main`, preserves existing comments
+   - When syncing from `main` to `no-comments`, strips comments
+   - Maintains file timestamps to avoid unnecessary recompilation
+   - Tracks sync state to avoid redundant operations
 
 ### How It Works
 
@@ -37,9 +45,16 @@ This allows developers to switch between viewing code with full documentation an
    - Preserves string literals that might contain comment-like patterns
 
 3. **Smart Compilation Preservation**:
-   - When only comments change, the daemon syncs without triggering recompilation
-   - Code changes are detected and flagged for manual review
+   - File timestamps are preserved during sync operations
    - Rust's target directory remains intact during branch switches
+   - The v2 daemon ensures both branches have identical code (modulo comments)
+
+4. **Bidirectional Sync (v2 daemon)**:
+   - All changes made in either branch are automatically synced to the other
+   - Code structure remains identical between branches
+   - Comments are preserved in the main branch when syncing from no-comments
+   - Comments are stripped when syncing from main to no-comments
+   - Real-time monitoring ensures immediate synchronization
 
 ## Testing
 

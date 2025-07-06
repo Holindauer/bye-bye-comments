@@ -85,16 +85,18 @@ bye-bye-comments uncomment
 
 ### Start the Background Daemon
 
-The daemon monitors file changes and intelligently syncs between branches:
+The daemon monitors file changes and automatically syncs between branches:
 
 ```bash
 bye-bye-comments daemon
 ```
 
 When the daemon is running:
-- Comment-only changes won't trigger recompilation
-- Code changes are detected and require manual syncing
-- Changes are automatically synchronized between branches
+- **All changes are synced bidirectionally** between branches
+- Code changes in `no-comments` branch sync to `main` (preserving comments)
+- Code changes in `main` branch sync to `no-comments` (stripping comments)
+- Changes sync in real-time as you save files
+- File timestamps are preserved to avoid unnecessary recompilation
 
 Stop the daemon:
 ```bash
